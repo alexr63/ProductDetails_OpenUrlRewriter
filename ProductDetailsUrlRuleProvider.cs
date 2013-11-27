@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using DotNetNuke.Entities.Modules;
+using DotNetNuke.Entities.Tabs;
 using DotNetNuke.Framework.Providers;
 using ProductList;
 using Satrabel.HttpModules.Provider;
@@ -34,13 +35,63 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
 
             using (SelectedHotelsEntities db = new SelectedHotelsEntities())
             {
-                ModuleController mc = new ModuleController();
-                ArrayList modules = mc.GetModulesByDefinition(PortalId, "Hotel Details");
+                ModuleController moduleController = new ModuleController();
+                ArrayList modules = moduleController.GetModulesByDefinition(PortalId, "Hotel Details");
                 foreach (ModuleInfo module in modules.OfType<ModuleInfo>())
                 {
+                    TabController tabController = new TabController();
+                    TabInfo tabInfo = tabController.GetTab(module.ParentTab.TabID);
+                    TabInfo parentTabInfo = tabController.GetTab(tabInfo.ParentId);
+                    ModuleInfo hotelListModuleInfo = null;
+                    foreach (var childModule in parentTabInfo.ChildModules)
+                    {
+                        if (childModule.Value.ModuleDefinition.DefinitionName == "HotelList")
+                        {
+                            hotelListModuleInfo = childModule.Value;
+                        }
+                    }
+
+                    if (hotelListModuleInfo == null)
+                    {
+                        continue;
+                    }
+
+                    object setting = hotelListModuleInfo.ModuleSettings["location"];
+                    int? locationId = null;
+                    if (setting != null)
+                    {
+                        try
+                        {
+                            locationId = Convert.ToInt32(setting);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+
+                    if (locationId == null)
+                    {
+                        continue;
+                    }
+
                     var hotels = Utils.HotelsInLocation(db, 1069);
                     foreach (var hotel in hotels)
                     {
+                        List<string> locations = new List<string>();
+                        if (hotel.Location != null)
+                        {
+                            locations.Add(CleanupUrl(hotel.Location.Name));
+                            if (hotel.Location.ParentLocation != null)
+                            {
+                                locations.Add(CleanupUrl(hotel.Location.ParentLocation.Name));
+                                if (hotel.Location.ParentLocation.ParentLocation != null)
+                                {
+                                    locations.Add(CleanupUrl(hotel.Location.ParentLocation.ParentLocation.Name));
+                                }
+                            }
+                        }
+                        locations.Reverse();
+
                         var rule = new UrlRule
                         {
                             CultureCode = module.CultureCode,
@@ -48,7 +99,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             RuleType = UrlRuleType.Module,
                             Parameters = "id=" + hotel.Id.ToString(),
                             Action = UrlRuleAction.Rewrite,
-                            Url = CleanupUrl(hotel.Name),
+                            Url = String.Join("/", locations) + "/" + CleanupUrl(hotel.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
