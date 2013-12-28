@@ -49,9 +49,6 @@
     <Reference Include="EntityFramework">
       <HintPath>..\..\..\Home\Cowrie\selectedhot.local\bin\EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="ProductList">
-      <HintPath>..\..\..\Home\Cowrie\selectedhot.local\bin\ProductList.dll</HintPath>
-    </Reference>
     <Reference Include="Satrabel.OpenUrlRewriter">
       <HintPath>..\..\..\Home\Cowrie\selectedhot.local\bin\Satrabel.OpenUrlRewriter.dll</HintPath>
     </Reference>
@@ -125,6 +122,12 @@
     <None Include="web.Release.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Home\Cowrie\selectedhot.local\DesktopModules\ProductList\ProductList.csproj">
+      <Project>{1ddf1f26-6796-4a6f-b7ad-7e599a860176}</Project>
+      <Name>ProductList</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

@@ -74,7 +74,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                         continue;
                     }
 
-                    var hotels = Utils.HotelsInLocation(db, 1069);
+                    var hotels = Utils.HotelsInLocation(db, locationId.Value, null);
                     foreach (var hotel in hotels)
                     {
                         List<string> locations = new List<string>();
@@ -97,7 +97,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             CultureCode = module.CultureCode,
                             TabId = module.TabID,
                             RuleType = UrlRuleType.Module,
-                            Parameters = "id=" + hotel.Id.ToString(),
+                            Parameters = "id=" + hotel.Id,
                             Action = UrlRuleAction.Rewrite,
                             Url = String.Join("/", locations) + "/" + CleanupUrl(hotel.Name),
                             RemoveTab = !includePageName
