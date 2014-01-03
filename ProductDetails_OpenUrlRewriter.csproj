@@ -46,13 +46,19 @@
     <Reference Include="DotNetNuke">
       <HintPath>..\..\..\Home\Cowrie\selectedhot.local\bin\DotNetNuke.dll</HintPath>
     </Reference>
-    <Reference Include="EntityFramework">
-      <HintPath>..\..\..\Home\Cowrie\selectedhot.local\bin\EntityFramework.dll</HintPath>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Home\Cowrie\selectedhot.local\DesktopModules\ProductList\packages\EntityFramework.6.0.2\lib\net40\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Home\Cowrie\selectedhot.local\DesktopModules\ProductList\packages\EntityFramework.6.0.2\lib\net40\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Satrabel.OpenUrlRewriter">
       <HintPath>..\..\..\Home\Cowrie\selectedhot.local\bin\Satrabel.OpenUrlRewriter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Web" />
@@ -111,6 +117,7 @@
     <None Include="App_LocalResources\View.ascx.resx" />
     <None Include="BuildScripts\ModulePackage.targets" />
     <None Include="BuildScripts\MSBuild.Community.Tasks.Targets" />
+    <Content Include="packages.config" />
     <None Include="ProductDetails_OpenUrlRewriter.dnn" />
     <None Include="module.css" />
     <None Include="ReleaseNotes.txt" />
@@ -124,9 +131,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Home\Cowrie\selectedhot.local\DesktopModules\ProductList\ProductList.csproj">
-      <Project>{1ddf1f26-6796-4a6f-b7ad-7e599a860176}</Project>
-      <Name>ProductList</Name>
+    <ProjectReference Include="..\SelectedHotelsModel\SelectedHotelsModel.csproj">
+      <Project>{58ed5699-0ce6-4868-9876-f99d40899857}</Project>
+      <Name>SelectedHotelsModel</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

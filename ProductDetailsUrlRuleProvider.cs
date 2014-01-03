@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using DotNetNuke.Entities.Modules;
 using DotNetNuke.Entities.Tabs;
 using DotNetNuke.Framework.Providers;
-using ProductList;
 using Satrabel.HttpModules.Provider;
+using SelectedHotelsModel;
 
 namespace Satrabel.OpenUrlRewriter.ProductDetails
 {
@@ -74,7 +74,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                         continue;
                     }
 
-                    var hotels = Utils.HotelsInLocation(db, locationId.Value, null);
+                    var hotels = db.HotelsInLocation(locationId.Value, null);
                     foreach (var hotel in hotels)
                     {
                         List<string> locations = new List<string>();
