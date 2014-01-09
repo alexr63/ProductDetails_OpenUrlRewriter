@@ -74,7 +74,16 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                         continue;
                     }
 
-                    var hotels = db.HotelsInLocation(locationId.Value, null);
+                    int? hotelTypeId = null;
+                    HotelType hotelType = null;
+                    setting = hotelListModuleInfo.ModuleSettings["hoteltype"];
+                    if (setting != null)
+                    {
+                        hotelTypeId = Convert.ToInt32(setting);
+                        hotelType = db.HotelTypes.Find(hotelTypeId);
+                    }
+
+                    var hotels = db.HotelsInLocation(locationId.Value, hotelTypeId);
                     foreach (var hotel in hotels)
                     {
                         List<string> locations = new List<string>();
@@ -99,7 +108,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             RuleType = UrlRuleType.Module,
                             Parameters = "id=" + hotel.Id,
                             Action = UrlRuleAction.Rewrite,
-                            Url = String.Join("/", locations) + "/" + CleanupUrl(hotel.Name),
+                            Url = String.Join("/", locations) + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) + CleanupUrl(hotel.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
