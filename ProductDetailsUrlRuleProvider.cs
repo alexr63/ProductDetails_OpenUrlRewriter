@@ -36,27 +36,11 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
             using (SelectedHotelsEntities db = new SelectedHotelsEntities())
             {
                 ModuleController moduleController = new ModuleController();
-                ArrayList modules = moduleController.GetModulesByDefinition(PortalId, "Hotel Details");
+                ArrayList modules = moduleController.GetModulesByDefinition(PortalId, "HotelList");
                 foreach (ModuleInfo module in modules.OfType<ModuleInfo>())
                 {
-                    TabController tabController = new TabController();
-                    TabInfo tabInfo = tabController.GetTab(module.ParentTab.TabID);
-                    TabInfo parentTabInfo = tabController.GetTab(tabInfo.ParentId);
-                    ModuleInfo hotelListModuleInfo = null;
-                    foreach (var childModule in parentTabInfo.ChildModules)
-                    {
-                        if (childModule.Value.ModuleDefinition.DefinitionName == "HotelList")
-                        {
-                            hotelListModuleInfo = childModule.Value;
-                        }
-                    }
-
-                    if (hotelListModuleInfo == null)
-                    {
-                        continue;
-                    }
-
-                    object setting = hotelListModuleInfo.ModuleSettings["location"];
+                    List<TabInfo> childTabs = TabController.GetTabsByParent(module.TabID, PortalId);
+                    object setting = module.ModuleSettings["location"];
                     int? locationId = null;
                     if (setting != null)
                     {
@@ -76,7 +60,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
 
                     int? hotelTypeId = null;
                     HotelType hotelType = null;
-                    setting = hotelListModuleInfo.ModuleSettings["hoteltype"];
+                    setting = module.ModuleSettings["hoteltype"];
                     if (setting != null)
                     {
                         hotelTypeId = Convert.ToInt32(setting);
@@ -104,7 +88,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                         var rule = new UrlRule
                         {
                             CultureCode = module.CultureCode,
-                            TabId = module.TabID,
+                            TabId = childTabs[0].TabID,
                             RuleType = UrlRuleType.Module,
                             Parameters = "id=" + hotel.Id,
                             Action = UrlRuleAction.Rewrite,
