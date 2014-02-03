@@ -36,8 +36,8 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
             using (SelectedHotelsEntities db = new SelectedHotelsEntities())
             {
                 ModuleController moduleController = new ModuleController();
-                ArrayList modules = moduleController.GetModulesByDefinition(PortalId, "HotelList");
-                foreach (ModuleInfo module in modules.OfType<ModuleInfo>())
+                ArrayList hotelListModules = moduleController.GetModulesByDefinition(PortalId, "HotelList");
+                foreach (ModuleInfo module in hotelListModules.OfType<ModuleInfo>())
                 {
                     List<TabInfo> childTabs = TabController.GetTabsByParent(module.TabID, PortalId);
                     object setting = module.ModuleSettings["location"];
@@ -93,6 +93,29 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             Parameters = "id=" + hotel.Id,
                             Action = UrlRuleAction.Rewrite,
                             Url = String.Join("/", locations) + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) + CleanupUrl(hotel.Name),
+                            RemoveTab = !includePageName
+                        };
+                        Rules.Add(rule);
+                    }
+                }
+
+                ArrayList clothesModules = moduleController.GetModulesByDefinition(PortalId, "Clothes");
+                foreach (ModuleInfo module in clothesModules.OfType<ModuleInfo>())
+                {
+                    List<TabInfo> childTabs = TabController.GetTabsByParent(module.TabID, PortalId);
+                    IEnumerable<Cloth> clothes = (from p in db.Products
+                                                where !p.IsDeleted
+                                                select p).OfType<Cloth>().ToList();
+                    foreach (var cloth in clothes)
+                    {
+                        var rule = new UrlRule
+                        {
+                            CultureCode = module.CultureCode,
+                            TabId = childTabs[0].TabID,
+                            RuleType = UrlRuleType.Module,
+                            Parameters = "id=" + cloth.Id,
+                            Action = UrlRuleAction.Rewrite,
+                            Url = "clothes/" + CleanupUrl(cloth.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
