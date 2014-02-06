@@ -115,7 +115,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             RuleType = UrlRuleType.Module,
                             Parameters = "id=" + cloth.Id,
                             Action = UrlRuleAction.Rewrite,
-                            Url = "clothes/" + CleanupUrl(cloth.Name),
+                            Url = cloth.Categories.First().Name + "/" + CleanupUrl(cloth.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
