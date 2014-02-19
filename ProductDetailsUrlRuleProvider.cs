@@ -99,19 +99,19 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                     }
                 }
 
-                ArrayList clothesModules = moduleController.GetModulesByDefinition(PortalId, "Clothes");
-                foreach (ModuleInfo module in clothesModules.OfType<ModuleInfo>())
+                ArrayList clothDetailsModules = moduleController.GetModulesByDefinition(PortalId, "Cloth Details");
+                foreach (ModuleInfo module in clothDetailsModules.OfType<ModuleInfo>())
                 {
-                    List<TabInfo> childTabs = TabController.GetTabsByParent(module.TabID, PortalId);
                     IEnumerable<Cloth> clothes = (from p in db.Products
                                                 where !p.IsDeleted
                                                 select p).OfType<Cloth>().ToList();
                     foreach (var cloth in clothes)
                     {
+                        var deparmentsNames = cloth.Departments.Select(d => CleanupUrl(d.Name));
                         var rule = new UrlRule
                         {
                             CultureCode = module.CultureCode,
-                            TabId = childTabs[0].TabID,
+                            TabId = module.TabID,
                             RuleType = UrlRuleType.Module,
                             Parameters = "id=" + cloth.Id,
                             Action = UrlRuleAction.Rewrite,
