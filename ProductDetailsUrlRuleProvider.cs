@@ -70,19 +70,9 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                     var hotels = db.HotelsInLocation(locationId.Value, hotelTypeId);
                     foreach (var hotel in hotels)
                     {
-                        List<string> locations = new List<string>();
-                        if (hotel.Location != null)
-                        {
-                            locations.Add(CleanupUrl(hotel.Location.Name));
-                            if (hotel.Location.ParentLocation != null)
-                            {
-                                locations.Add(CleanupUrl(hotel.Location.ParentLocation.Name));
-                                if (hotel.Location.ParentLocation.ParentLocation != null)
-                                {
-                                    locations.Add(CleanupUrl(hotel.Location.ParentLocation.ParentLocation.Name));
-                                }
-                            }
-                        }
+                        var locations =
+                            hotel.HotelLocations.OrderByDescending(hl => hl.Location.LocationTypeId)
+                                .Select(hl => hl.Location.Name);
                         locations.Reverse();
 
                         var rule = new UrlRule
