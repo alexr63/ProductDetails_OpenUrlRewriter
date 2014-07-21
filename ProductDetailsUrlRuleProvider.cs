@@ -40,41 +40,22 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                 foreach (ModuleInfo module in hotelListModules.OfType<ModuleInfo>())
                 {
                     List<TabInfo> childTabs = TabController.GetTabsByParent(module.TabID, PortalId);
-                    object setting = module.ModuleSettings["location"];
-                    int? locationId = null;
-                    if (setting != null)
-                    {
-                        try
-                        {
-                            locationId = Convert.ToInt32(setting);
-                        }
-                        catch (Exception)
-                        {
-                        }
-                    }
-
-                    if (locationId == null)
-                    {
-                        continue;
-                    }
-
                     int? hotelTypeId = null;
                     HotelType hotelType = null;
-                    setting = module.ModuleSettings["hoteltype"];
+                    object setting = module.ModuleSettings["hoteltype"];
                     if (setting != null)
                     {
                         hotelTypeId = Convert.ToInt32(setting);
                         hotelType = db.HotelTypes.Find(hotelTypeId);
                     }
 
-                    var hotels = db.HotelsInLocation(locationId.Value, hotelTypeId);
+                    var hotels = from hotel in db.Products.Where(p => !p.IsDeleted).OfType<Hotel>()
+                        where
+                            !hotel.IsDeleted && hotel.GeoName != null &&
+                            (hotelTypeId == null || hotel.HotelTypeId == hotelTypeId)
+                        select hotel;
                     foreach (var hotel in hotels)
                     {
-                        var locations =
-                            hotel.HotelLocations.OrderByDescending(hl => hl.Location.LocationTypeId)
-                                .Select(hl => hl.Location.Name);
-                        locations.Reverse();
-
                         var rule = new UrlRule
                         {
                             CultureCode = module.CultureCode,
@@ -82,7 +63,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             RuleType = UrlRuleType.Module,
                             Parameters = "id=" + hotel.Id,
                             Action = UrlRuleAction.Rewrite,
-                            Url = String.Join("/", locations) + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) + CleanupUrl(hotel.Name),
+                            Url = hotel.GeoName.Name + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) + CleanupUrl(hotel.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
