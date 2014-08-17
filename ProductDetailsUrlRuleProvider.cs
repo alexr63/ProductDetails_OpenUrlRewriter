@@ -70,7 +70,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                     }
                 }
 
-                ArrayList clothDetailsModules = moduleController.GetModulesByDefinition(PortalId, "Cloth Details");
+                ArrayList clothDetailsModules = moduleController.GetModulesByDefinition(PortalId, "ClothDetails");
                 foreach (ModuleInfo module in clothDetailsModules.OfType<ModuleInfo>())
                 {
                     IEnumerable<Cloth> clothes = (from p in db.Products
