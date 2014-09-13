@@ -36,7 +36,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
             using (SelectedHotelsEntities db = new SelectedHotelsEntities())
             {
                 ModuleController moduleController = new ModuleController();
-                ArrayList hotelListModules = moduleController.GetModulesByDefinition(PortalId, "HotelList");
+                ArrayList hotelListModules = moduleController.GetModulesByDefinition(PortalId, "Hotels");
                 foreach (ModuleInfo module in hotelListModules.OfType<ModuleInfo>())
                 {
                     List<TabInfo> childTabs = TabController.GetTabsByParent(module.TabID, PortalId);
