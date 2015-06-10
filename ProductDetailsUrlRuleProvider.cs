@@ -49,10 +49,9 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                         hotelType = db.HotelTypes.Find(hotelTypeId);
                     }
 
-                    var hotels = from hotel in db.Products.Where(p => !p.IsDeleted).OfType<Hotel>()
+                    var hotels = from hotel in db.Products.OfType<Hotel>()
                         where
-                            !hotel.IsDeleted && hotel.GeoName != null &&
-                            (hotelTypeId == null || hotel.HotelTypeId == hotelTypeId)
+                            hotel.GeoName != null && (hotelTypeId == null || hotel.HotelTypeId == hotelTypeId)
                         select hotel;
                     foreach (var hotel in hotels)
                     {
@@ -73,12 +72,11 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                 ArrayList clothDetailsModules = moduleController.GetModulesByDefinition(PortalId, "ClothDetails");
                 foreach (ModuleInfo module in clothDetailsModules.OfType<ModuleInfo>())
                 {
-                    IEnumerable<Cloth> clothes = (from p in db.Products
-                                                where !p.IsDeleted
-                                                select p).OfType<Cloth>().ToList();
+                    var clothes = from cloth in db.Products.OfType<Cloth>()
+                        select cloth;
                     foreach (var cloth in clothes)
                     {
-                        var deparmentsNames = cloth.Departments.Select(d => CleanupUrl(d.Name));
+                        //var deparmentsNames = cloth.Departments.Select(d => CleanupUrl(d.Name));
                         var rule = new UrlRule
                         {
                             CultureCode = module.CultureCode,
