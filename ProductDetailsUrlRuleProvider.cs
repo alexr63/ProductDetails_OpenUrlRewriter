@@ -50,11 +50,16 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                     }
 
                     var hotels = from hotel in db.Products.OfType<Hotel>()
-                        where
-                            hotel.GeoName != null && (hotelTypeId == null || hotel.HotelTypeId == hotelTypeId)
+                        where hotel.GeoNameId != null && (hotelTypeId == null || hotel.HotelTypeId == hotelTypeId)
                         select hotel;
                     foreach (var hotel in hotels)
                     {
+                        if (hotel.GeoName == null)
+                            continue;
+
+                        if (childTabs.Count == 0)
+                            continue;
+
                         var rule = new UrlRule
                         {
                             CultureCode = module.CultureCode,
@@ -62,7 +67,9 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             RuleType = UrlRuleType.Module,
                             Parameters = "id=" + hotel.Id,
                             Action = UrlRuleAction.Rewrite,
-                            Url = hotel.GeoName.Name + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) + CleanupUrl(hotel.Name),
+                            Url =
+                                hotel.GeoName.Name + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) +
+                                CleanupUrl(hotel.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
