@@ -2,12 +2,13 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Security.Cryptography;
 using DotNetNuke.Entities.Modules;
 using DotNetNuke.Entities.Tabs;
 using DotNetNuke.Framework.Providers;
 using Satrabel.HttpModules.Provider;
 using SelectedHotelsModel;
+using UrlRule = Satrabel.HttpModules.Provider.UrlRule;
 
 namespace Satrabel.OpenUrlRewriter.ProductDetails
 {
@@ -40,6 +41,14 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                 foreach (ModuleInfo module in hotelListModules.OfType<ModuleInfo>())
                 {
                     List<TabInfo> childTabs = TabController.GetTabsByParent(module.TabID, PortalId);
+
+                    if (childTabs.Count == 0)
+                        continue;
+
+                    int childTabId = childTabs[0].TabID;
+                    //if (db.UrlRules.Any(r => r.TabId == childTabId && r.RuleType == 2 /* UrlRuleType.Module */))
+                    //    continue;
+
                     int? hotelTypeId = null;
                     HotelType hotelType = null;
                     object setting = module.ModuleSettings["hoteltype"];
@@ -49,27 +58,26 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                         hotelType = db.HotelTypes.Find(hotelTypeId);
                     }
 
-                    var hotels = from hotel in db.Products.OfType<Hotel>()
-                        where hotel.GeoNameId != null && (hotelTypeId == null || hotel.HotelTypeId == hotelTypeId)
-                        select hotel;
-                    foreach (var hotel in hotels)
+                    //var hotels = from hotel in db.Products.OfType<Hotel>()
+                    //    where hotel.GeoNameId != null && (hotelTypeId == null || hotel.HotelTypeId == hotelTypeId)
+                    //    select hotel;
+                    var hotelViews = from hotelView in db.HotelViews
+                        select hotelView;
+                    foreach (var hotelView in hotelViews)
                     {
-                        if (hotel.GeoName == null)
-                            continue;
-
-                        if (childTabs.Count == 0)
-                            continue;
+                        //if (hotelView.GeoName == null)
+                        //    continue;
 
                         var rule = new UrlRule
                         {
                             CultureCode = module.CultureCode,
-                            TabId = childTabs[0].TabID,
+                            TabId = childTabId,
                             RuleType = UrlRuleType.Module,
-                            Parameters = "id=" + hotel.Id,
+                            Parameters = "id=" + hotelView.Id,
                             Action = UrlRuleAction.Rewrite,
                             Url =
-                                hotel.GeoName.Name + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) +
-                                CleanupUrl(hotel.Name),
+                                hotelView.GeoName + "/" + (hotelType != null ? hotelType.Name + "/" : String.Empty) +
+                                CleanupUrl(hotelView.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
@@ -79,9 +87,11 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                 ArrayList clothDetailsModules = moduleController.GetModulesByDefinition(PortalId, "ClothDetails");
                 foreach (ModuleInfo module in clothDetailsModules.OfType<ModuleInfo>())
                 {
-                    var clothes = from cloth in db.Products.OfType<Cloth>()
-                        select cloth;
-                    foreach (var cloth in clothes)
+                    //var clothes = from cloth in db.Products.OfType<Cloth>()
+                    //    select cloth;
+                    var clothViews = from clothView in db.ClothViews
+                        select clothView;
+                    foreach (var clothView in clothViews)
                     {
                         //var deparmentsNames = cloth.Departments.Select(d => CleanupUrl(d.Name));
                         var rule = new UrlRule
@@ -89,9 +99,9 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                             CultureCode = module.CultureCode,
                             TabId = module.TabID,
                             RuleType = UrlRuleType.Module,
-                            Parameters = "id=" + cloth.Id,
+                            Parameters = "id=" + clothView.Id,
                             Action = UrlRuleAction.Rewrite,
-                            Url = CleanupUrl(cloth.Brand.Name) + "/" + CleanupUrl(cloth.Name),
+                            Url = CleanupUrl(clothView.BrandName) + "/" + CleanupUrl(clothView.Name),
                             RemoveTab = !includePageName
                         };
                         Rules.Add(rule);
