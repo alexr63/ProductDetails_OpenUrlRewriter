@@ -84,7 +84,7 @@ namespace Satrabel.OpenUrlRewriter.ProductDetails
                     }
                 }
 
-                ArrayList clothesModules = moduleController.GetModulesByDefinition(PortalId, "Clothes");
+                ArrayList clothesModules = moduleController.GetModulesByDefinition(PortalId, "Clothing");
                 foreach (ModuleInfo clothesModuleInfo in clothesModules.OfType<ModuleInfo>())
                 {
                     List<TabInfo> childTabs = TabController.GetTabsByParent(clothesModuleInfo.TabID, PortalId);
